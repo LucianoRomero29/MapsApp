@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 part 'gps_event.dart';
 part 'gps_state.dart';
 
 class GpsBloc extends Bloc<GpsEvent, GpsState> {
+  StreamSubscription? gpsServiceSubscription;
+
   GpsBloc()
       : super(const GpsState(
             isGpsEnabled: false, isGpsPermissionGranted: false)) {
@@ -18,24 +23,50 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
 
   //DETECTAR BOTON DE UBICACION
   Future<void> _init() async {
-    final isEnabled = await _checkGpsStatus();
-    print('Is enabled: $isEnabled');
+    final gpsInitStatus =
+        await Future.wait([_checkGpsStatus(), _isPermissionGranted()]);
+
+    add(GpsAndPermissionEvent(gpsInitStatus[0], gpsInitStatus[1]));
+  }
+
+  Future<bool> _isPermissionGranted() async {
+    final isGranted = await Permission.location.isGranted;
+
+    return isGranted;
   }
 
   Future<bool> _checkGpsStatus() async {
     final isEnabled = await Geolocator.isLocationServiceEnabled();
 
-    Geolocator.getServiceStatusStream().listen((event) {
+    gpsServiceSubscription =
+        Geolocator.getServiceStatusStream().listen((event) {
       final isEnabled = (event.index == 1) ? true : false;
-      print('Service status $isEnabled');
+      add(GpsAndPermissionEvent(isEnabled, state.isGpsPermissionGranted));
     });
 
     return isEnabled;
   }
 
+  Future<void> askGpsAccess() async {
+    final status = await Permission.location.request();
+
+    switch (status) {
+      case PermissionStatus.granted:
+        add(GpsAndPermissionEvent(state.isGpsEnabled, true));
+        break;
+      case PermissionStatus.denied:
+      case PermissionStatus.restricted:
+      case PermissionStatus.limited:
+      case PermissionStatus.permanentlyDenied:
+        add(GpsAndPermissionEvent(state.isGpsEnabled, false));
+        //este metodo te abre las settings del celu, viene con el paquete de Permission
+        openAppSettings();
+    }
+  }
+
   @override
   Future<void> close() {
-    // TODO: Limpiar el ServiceStatus Stream
+    gpsServiceSubscription!.cancel();
     return super.close();
   }
 }

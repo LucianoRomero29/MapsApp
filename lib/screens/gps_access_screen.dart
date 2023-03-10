@@ -14,10 +14,7 @@ class GpsAccessScreen extends StatelessWidget {
               ? _EnableGpsMessage()
               : const _AccessButton();
         },
-      )
-          //_AccessButton(),
-          // child: _AccessButton(),
-          ),
+      )),
     );
   }
 }
@@ -41,7 +38,8 @@ class _AccessButton extends StatelessWidget {
             child: const Text("Gps access is required",
                 style: TextStyle(color: Colors.white)),
             onPressed: () {
-              //
+              final gpsBloc = BlocProvider.of<GpsBloc>(context);
+              gpsBloc.askGpsAccess();
             })
       ],
     );
