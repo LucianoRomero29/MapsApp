@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_app/blocs/blocs.dart';
 import 'package:maps_app/views/views.dart';
 import 'package:maps_app/widgets/btn_toggle_user_route.dart';
+import 'package:maps_app/widgets/manual_marker.dart';
 import 'package:maps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
@@ -55,7 +56,9 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     MapView(
                         initialLocation: locationState.lastKnownLocation!,
-                        polylines: polylines.values.toSet())
+                        polylines: polylines.values.toSet()),
+                    const SearchBar(),
+                    const ManualMarker()
                   ],
                 ),
               );
