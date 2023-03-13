@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:maps_app/blocs/blocs.dart';
 import 'package:maps_app/views/views.dart';
+import 'package:maps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -32,18 +33,25 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
-      builder: (context, state) {
-        if (state.lastKnownLocation == null) {
-          return const Center(child: Text("Wait please..."));
-        }
+    return Scaffold(
+      body: BlocBuilder<LocationBloc, LocationState>(
+        builder: (context, state) {
+          if (state.lastKnownLocation == null) {
+            return const Center(child: Text("Wait please..."));
+          }
 
-        return SingleChildScrollView(
-          child: Stack(
-            children: [MapView(initialLocation: state.lastKnownLocation!)],
-          ),
-        );
-      },
-    ));
+          return SingleChildScrollView(
+            child: Stack(
+              children: [MapView(initialLocation: state.lastKnownLocation!)],
+            ),
+          );
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: const [BtnCurrentLocation()],
+      ),
+    );
   }
 }
