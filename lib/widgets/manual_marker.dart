@@ -1,7 +1,8 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:maps_app/blocs/blocs.dart';
+import 'package:maps_app/helpers/helpers.dart';
 
 class ManualMarker extends StatelessWidget {
   const ManualMarker({super.key});
@@ -9,8 +10,9 @@ class ManualMarker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SearchBloc, SearchState>(
-      builder: (context, state) => state.displayManualMarker ? const _ManualMarkerBody() : const SizedBox()
-    );
+        builder: (context, state) => state.displayManualMarker
+            ? const _ManualMarkerBody()
+            : const SizedBox());
   }
 }
 
@@ -19,15 +21,16 @@ class _ManualMarkerBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    final mapBloc = BlocProvider.of<MapBloc>(context);
 
-    return SizedBox (
+    return SizedBox(
       width: size.width,
       height: size.height,
       child: Stack(
         children: [
-
           const Positioned(
             top: 70,
             left: 20,
@@ -37,9 +40,8 @@ class _ManualMarkerBody extends StatelessWidget {
             child: Transform.translate(
               offset: const Offset(0, -20),
               child: BounceInDown(
-                from: 100,
-                child: const Icon(Icons.location_on_rounded, size: 50)
-              ),
+                  from: 100,
+                  child: const Icon(Icons.location_on_rounded, size: 50)),
             ),
           ),
           Positioned(
@@ -53,9 +55,25 @@ class _ManualMarkerBody extends StatelessWidget {
                 elevation: 0,
                 height: 50,
                 shape: const StadiumBorder(),
-                child: const Text("Confirm destination", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300)),
-                onPressed: (){
-                  //TODO: Confirmar tu ubi
+                child: const Text("Confirm destination",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w300)),
+                onPressed: () async {
+                  final start = locationBloc.state.lastKnownLocation;
+                  if (start == null) return;
+
+                  final end = mapBloc.mapCenter;
+                  if (end == null) return;
+
+                  showLoadingMessage(context);
+
+                  final destination =
+                      await searchBloc.getCoorsStartToEnd(start, end);
+                  mapBloc.drawRoutePolyline(destination);
+
+                  searchBloc.add(OnDisabledManualMarkerEvent());
+
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -80,7 +98,7 @@ class _BtnBack extends StatelessWidget {
         backgroundColor: Colors.white,
         child: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: (){
+          onPressed: () {
             final searchBloc = BlocProvider.of<SearchBloc>(context);
             searchBloc.add(OnDisabledManualMarkerEvent());
           },
