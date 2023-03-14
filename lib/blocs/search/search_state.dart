@@ -28,3 +28,4 @@ class SearchState extends Equatable {
   @override
   List<Object> get props => [ displayManualMarker, places, history ];
 }
+

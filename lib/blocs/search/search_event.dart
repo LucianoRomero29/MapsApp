@@ -20,3 +20,4 @@ class AddToHistoryEvent extends SearchEvent {
   final Feature place;
   const AddToHistoryEvent(this.place);
 }
+

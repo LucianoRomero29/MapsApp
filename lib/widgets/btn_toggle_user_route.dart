@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:maps_app/blocs/blocs.dart';
-import 'package:maps_app/ui/ui.dart';
+
 
 class BtnToggleUserRoute extends StatelessWidget {
-  const BtnToggleUserRoute({super.key});
+  const BtnToggleUserRoute({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     final mapBloc = BlocProvider.of<MapBloc>(context);
 
     return Container(
@@ -16,11 +17,11 @@ class BtnToggleUserRoute extends StatelessWidget {
         backgroundColor: Colors.white,
         maxRadius: 25,
         child: IconButton(
-            icon: const Icon(Icons.more_horiz_rounded, color: Colors.black),
-            onPressed: () {
-              mapBloc.add(OnToggleUserRoute());
-            },
+          icon: const Icon( Icons.more_horiz_rounded, color: Colors.black),
+          onPressed: () {
+            mapBloc.add( OnToggleUserRoute() );
+          })
       ),
-    ));
+    );
   }
 }

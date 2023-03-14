@@ -68,15 +68,13 @@ class _ManualMarkerBody extends StatelessWidget {
               duration: const Duration( milliseconds: 300 ),
               child: MaterialButton(
                 minWidth: size.width -120,
-                child: const Text('Confirm destination', style: TextStyle( color: Colors.white, fontWeight: FontWeight.w300 )),
                 color: Colors.black,
                 elevation: 0,
                 height: 50,
                 shape: const StadiumBorder(),
+                child: const Text('Confimar destino', style: TextStyle( color: Colors.white, fontWeight: FontWeight.w300 )),
                 onPressed: () async {
-                
-                  // Todo: loading
-
+            
                   final start = locationBloc.state.lastKnownLocation;
                   if ( start == null ) return;
 

@@ -4,12 +4,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:maps_app/blocs/blocs.dart';
 import 'package:maps_app/views/views.dart';
+
 import 'package:maps_app/widgets/btn_toggle_user_route.dart';
-import 'package:maps_app/widgets/manual_marker.dart';
 import 'package:maps_app/widgets/widgets.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({Key? key}) : super(key: key);
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -23,14 +23,13 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
 
     locationBloc = BlocProvider.of<LocationBloc>(context);
-    //locationBloc.getCurrentPosition();
+    // locationBloc.getCurrentPosition();
     locationBloc.startFollowingUser();
   }
 
   @override
   void dispose() {
     locationBloc.stopFollowingUser();
-
     super.dispose();
   }
 
@@ -39,15 +38,16 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       body: BlocBuilder<LocationBloc, LocationState>(
         builder: (context, locationState) {
+
           if (locationState.lastKnownLocation == null) {
-            return const Center(child: Text("Wait please..."));
+            return const Center(child: Text('Espere por favor...'));
           }
 
           return BlocBuilder<MapBloc, MapState>(
             builder: (context, mapState) {
 
-              Map<String, Polyline> polylines = Map.from(mapState.polylines);
-              if(!mapState.showMyRoute){
+              Map<String, Polyline> polylines = Map.from( mapState.polylines );
+              if ( !mapState.showMyRoute ) {
                 polylines.removeWhere((key, value) => key == 'myRoute');
               }
 
@@ -55,10 +55,13 @@ class _MapScreenState extends State<MapScreen> {
                 child: Stack(
                   children: [
                     MapView(
-                        initialLocation: locationState.lastKnownLocation!,
-                        polylines: polylines.values.toSet()),
+                      initialLocation: locationState.lastKnownLocation!,
+                      polylines: polylines.values.toSet(), 
+                      markers: mapState.markers.values.toSet(),
+                    ),
+
                     const SearchBar(),
-                    const ManualMarker()
+                    const ManualMarker(),
                   ],
                 ),
               );
@@ -71,8 +74,8 @@ class _MapScreenState extends State<MapScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: const [
           BtnToggleUserRoute(),
-          BtnFollowUser(), 
-          BtnCurrentLocation()
+          BtnFollowUser(),
+          BtnCurrentLocation(),
         ],
       ),
     );
